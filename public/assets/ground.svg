@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+<rect width="800" height="800" fill="#dfe9df"/>
+<circle cx="650" cy="130" r="180" fill="#b99b61" opacity=".18"/>
+<ellipse cx="400" cy="680" rx="230" ry="45" fill="#0a2b1a" opacity=".18"/>
+<rect x="220" y="120" width="360" height="510" rx="25" fill="#f7f3e9"/>
+<rect x="250" y="150" width="300" height="450" rx="18" fill="#17432d"/>
+<text x="400" y="280" text-anchor="middle" fill="#fff" font-family="Arial" font-weight="700" font-size="48">ANDALÉ</text>
+<text x="400" y="325" text-anchor="middle" fill="#b9d9c3" font-family="Arial" font-size="20" letter-spacing="6">COFFEE</text>
+<text x="400" y="410" text-anchor="middle" fill="#fff" font-family="Arial" font-size="30">GROUND 200 g</text>
+<text x="400" y="455" text-anchor="middle" fill="#d2e5d7" font-family="Arial" font-size="18">KOPI SUMATERA UTARA</text>
+<circle cx="400" cy="520" r="45" fill="#b99b61"/>
+<text x="400" y="530" text-anchor="middle" fill="#173d29" font-family="Arial" font-weight="700" font-size="14">SUMUT</text>
+</svg>

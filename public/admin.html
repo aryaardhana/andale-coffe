@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Andalé Admin Dashboard</title>
+  <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="admin-brand">ANDALÉ <span>ADMIN</span></div>
+    <h1>Dashboard</h1>
+    <p>Masuk untuk mengelola produk, stok, dan pesanan.</p>
+    <form id="login-form">
+      <input id="username" value="admin" required placeholder="Username">
+      <input id="password" type="password" value="admin12345" required placeholder="Password">
+      <button>Masuk</button>
+    </form>
+    <small>Demo awal: admin / admin12345. Segera ganti password untuk penggunaan nyata.</small>
+  </div>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="sidebar">
+    <div class="admin-brand">ANDALÉ <span>ADMIN</span></div>
+    <button data-tab="overview" class="nav-item active">Overview</button>
+    <button data-tab="products" class="nav-item">Produk & Stok</button>
+    <button data-tab="orders" class="nav-item">Pesanan</button>
+    <button data-tab="movements" class="nav-item">Riwayat Stok</button>
+    <button data-tab="security" class="nav-item">Keamanan</button>
+    <button id="logout" class="logout">Keluar</button>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div><span class="eyebrow">ANDALÉ COFFEE</span><h1 id="page-title">Overview</h1></div>
+      <a href="/" target="_blank">Lihat Website ↗</a>
+    </header>
+
+    <section id="tab-overview" class="tab">
+      <div class="stats">
+        <div class="stat"><span>Omzet dibayar</span><b id="stat-revenue">Rp0</b></div>
+        <div class="stat"><span>Total pesanan</span><b id="stat-orders">0</b></div>
+        <div class="stat"><span>Menunggu pembayaran</span><b id="stat-pending">0</b></div>
+        <div class="stat"><span>Stok rendah</span><b id="stat-low">0</b></div>
+      </div>
+      <div class="panel">
+        <h2>Kontrol sistem</h2>
+        <p>Dashboard ini membaca data langsung dari SQLite. Perubahan stok dan status pesanan tersimpan di database.</p>
+      </div>
+    </section>
+
+    <section id="tab-products" class="tab hidden">
+      <div class="toolbar"><h2>Produk & Stok</h2><button class="primary" id="new-product">+ Produk</button></div>
+      <div class="panel table-wrap">
+        <table><thead><tr><th>Produk</th><th>Harga</th><th>Stok</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="products-table"></tbody></table>
+      </div>
+    </section>
+
+    <section id="tab-orders" class="tab hidden">
+      <div class="toolbar"><h2>Pesanan</h2><button id="refresh-orders">Refresh</button></div>
+      <div id="orders-list" class="orders"></div>
+    </section>
+
+    <section id="tab-security" class="tab hidden">
+      <div class="toolbar"><h2>Keamanan Admin</h2></div>
+      <div class="panel" style="max-width:520px">
+        <form id="password-form">
+          <label>Password lama<input id="old-password" type="password" required></label>
+          <label>Password baru<input id="new-password" type="password" minlength="10" required></label>
+          <button class="primary">Ganti Password</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="tab-movements" class="tab hidden">
+      <div class="toolbar"><h2>Riwayat Stok</h2></div>
+      <div class="panel table-wrap">
+        <table><thead><tr><th>Waktu</th><th>Produk</th><th>Perubahan</th><th>Stok akhir</th><th>Alasan</th></tr></thead><tbody id="movements-table"></tbody></table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="product-modal" class="modal-wrap hidden">
+  <div class="modal">
+    <button id="close-product" class="x">×</button>
+    <h2 id="product-modal-title">Produk Baru</h2>
+    <form id="product-form">
+      <input type="hidden" id="p-id">
+      <label>Nama<input id="p-name" required></label>
+      <label>Slug<input id="p-slug" required></label>
+      <label>Deskripsi<textarea id="p-description" required></textarea></label>
+      <label>Harga<input id="p-price" type="number" min="0" required></label>
+      <label>Stok<input id="p-stock" type="number" min="0" required></label>
+      <label>Status<select id="p-active"><option value="1">Aktif</option><option value="0">Nonaktif</option></select></label>
+      <label>Gambar<input id="p-image" type="file" accept="image/*"></label>
+      <button class="primary">Simpan Produk</button>
+    </form>
+  </div>
+</div>
+
+<script src="/admin.js"></script>
+</body>
+</html>

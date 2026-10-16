@@ -1,0 +1,33 @@
+let editingId=null;
+const rupiah=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n);
+async function api(url,opt={}){const r=await fetch(url,opt);const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.message||"Error");return d}
+async function check(){try{await api("/api/admin/me");showApp();loadAll()}catch{showLogin()}}
+function showLogin(){document.getElementById("login-screen").classList.remove("hidden");document.getElementById("app").classList.add("hidden")}
+function showApp(){document.getElementById("login-screen").classList.add("hidden");document.getElementById("app").classList.remove("hidden")}
+document.getElementById("login-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/admin/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:document.getElementById("username").value,password:document.getElementById("password").value})});showApp();loadAll()}catch(x){alert(x.message)}});
+document.getElementById("logout").onclick=async()=>{await api("/api/admin/logout",{method:"POST"});showLogin()};
+document.querySelectorAll(".nav-item").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+function switchTab(tab){document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.dataset.tab===tab));document.querySelectorAll(".tab").forEach(x=>x.classList.add("hidden"));document.getElementById(`tab-${tab}`).classList.remove("hidden");document.getElementById("page-title").textContent={overview:"Overview",products:"Produk & Stok",orders:"Pesanan",movements:"Riwayat Stok",security:"Keamanan"}[tab];if(tab==="products")loadProducts();if(tab==="orders")loadOrders();if(tab==="movements")loadMovements()}
+async function loadAll(){loadDashboard();loadProducts();loadOrders();loadMovements()}
+async function loadDashboard(){const d=await api("/api/admin/dashboard");document.getElementById("stat-revenue").textContent=rupiah(d.revenue);document.getElementById("stat-orders").textContent=d.orders;document.getElementById("stat-pending").textContent=d.pending;document.getElementById("stat-low").textContent=d.lowStock}
+async function loadProducts(){const rows=await api("/api/admin/products");document.getElementById("products-table").innerHTML=rows.map(p=>`<tr><td><img src="${p.image||""}"> ${esc(p.name)}</td><td>${rupiah(p.price)}</td><td><b>${p.stock}</b></td><td><span class="badge">${p.active?"Aktif":"Nonaktif"}</span></td><td><button class="action" onclick='editProduct(${JSON.stringify(p)})'>Edit</button> <button class="action" onclick="deleteProduct(${p.id})">Nonaktifkan</button></td></tr>`).join("")}
+function editProduct(p){editingId=p.id;document.getElementById("product-modal-title").textContent="Edit Produk";document.getElementById("p-id").value=p.id;document.getElementById("p-name").value=p.name;document.getElementById("p-slug").value=p.slug;document.getElementById("p-description").value=p.description;document.getElementById("p-price").value=p.price;document.getElementById("p-stock").value=p.stock;document.getElementById("p-active").value=p.active;document.getElementById("product-modal").classList.remove("hidden")}
+document.getElementById("new-product").onclick=()=>{editingId=null;document.getElementById("product-modal-title").textContent="Produk Baru";document.getElementById("product-form").reset();document.getElementById("p-id").value="";document.getElementById("p-active").value="1";document.getElementById("product-modal").classList.remove("hidden")};
+document.getElementById("close-product").onclick=()=>document.getElementById("product-modal").classList.add("hidden");
+document.getElementById("product-form").addEventListener("submit",async e=>{e.preventDefault();const fd=new FormData();["name","slug","description","price","stock","active"].forEach(k=>fd.append(k,document.getElementById("p-"+k).value));const f=document.getElementById("p-image").files[0];if(f)fd.append("image",f);try{await api(editingId?`/api/admin/products/${editingId}`:"/api/admin/products",{method:editingId?"PUT":"POST",body:fd});document.getElementById("product-modal").classList.add("hidden");loadProducts();loadDashboard()}catch(x){alert(x.message)}});
+async function deleteProduct(id){if(!confirm("Nonaktifkan produk ini?"))return;await api(`/api/admin/products/${id}`,{method:"DELETE"});loadProducts();loadDashboard()}
+async function loadOrders(){const orders=await api("/api/admin/orders");document.getElementById("orders-list").innerHTML=orders.length?orders.map(o=>`<article class="order-card"><div class="order-head"><div><b>${esc(o.order_code)}</b><div>${esc(o.customer_name)} · ${esc(o.phone)}</div><small>${new Date(o.created_at+"Z").toLocaleString("id-ID")}</small></div><div><span class="badge">${o.payment_status}</span> <span class="badge">${o.fulfillment_status}</span></div></div><div class="order-items">${o.items.map(i=>`${esc(i.product_name)} × ${i.quantity} = ${rupiah(i.subtotal)}`).join("<br>")}</div><b>Total ${rupiah(o.total)}</b><div class="order-controls"><label>Status pengiriman</label><select onchange="updateFulfillment(${o.id},this.value)">${["new","processing","shipped","completed","cancelled"].map(s=>`<option ${s===o.fulfillment_status?"selected":""}>${s}</option>`).join("")}</select></div></article>`).join(""):"<div class='panel'>Belum ada pesanan.</div>"}
+async function updateFulfillment(id,status){await api(`/api/admin/orders/${id}/fulfillment`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})});loadOrders()}
+async function loadMovements(){const rows=await api("/api/admin/stock-movements");document.getElementById("movements-table").innerHTML=rows.map(x=>`<tr><td>${new Date(x.created_at+"Z").toLocaleString("id-ID")}</td><td>${esc(x.name)}</td><td>${x.change_amount>0?"+":""}${x.change_amount}</td><td>${x.stock_after}</td><td>${esc(x.reason)}</td></tr>`).join("")}
+document.getElementById("refresh-orders").onclick=loadOrders;
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+check();
+
+document.getElementById("password-form").addEventListener("submit",async e=>{
+  e.preventDefault();
+  try{
+    await api("/api/admin/change-password",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({currentPassword:document.getElementById("old-password").value,newPassword:document.getElementById("new-password").value})});
+    alert("Password berhasil diubah. Silakan login kembali.");
+    await api("/api/admin/logout",{method:"POST"}); showLogin();
+  }catch(x){alert(x.message)}
+});

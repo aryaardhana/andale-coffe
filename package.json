@@ -1,0 +1,24 @@
+{
+  "name": "andale-coffee-store",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Full-stack e-commerce website for Andalé Coffee",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "better-sqlite3": "^12.4.1",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^17.4.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "midtrans-client": "^1.4.3",
+    "multer": "^2.0.2"
+  }
+}
